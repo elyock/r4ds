@@ -1,7 +1,13 @@
 ---
-title: "ch01"
-format: html
+title: "Chapter 1"
+author: "Kevin J. Coyle"
+format: gfm
 editor: visual
 ---
 
-## 
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+```
