@@ -1,2 +1,3 @@
 # r4ds
-Code from R for Data Science 2e.
+
+Exercise answers for **R for Data Science 2e**.
