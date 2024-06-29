@@ -156,10 +156,7 @@ ggplot(penguins, aes(x = species)) +
 
 The `bins` argument sets the number of bins in the histogram. It defaults to 30.
 
-4.  Make a histogram of the `carat` variable in the `diamonds`
-    dataset that is available when you load the tidyverse package.
-    Experiment with different binwidths. What binwidth reveals the most
-    interesting patterns?
+4.  Make a histogram of the `carat` variable in the `diamonds` dataset that is available when you load the tidyverse package. Experiment with different binwidths. What binwidth reveals the most interesting patterns?
 
 ```{r}
 bins <- as.integer(pracma::nthroot(nrow(diamonds), 3) * 2)  # Rice's rule
@@ -168,4 +165,124 @@ ggplot(diamonds, aes(x = carat)) +
   geom_histogram(binwidth = bin_width)
 ```
 
-Rice's rule looks like a good choice for calculating the number of bins, and, correspondingly, an interesting `binwidth`.
+*Rice's rule* looks like a good choice for calculating the number of bins, and, correspondingly, an interesting `binwidth`.
+
+#### 1.5.5 Exercises
+
+1.  The `mpg` data frame that is bundled with the ggplot2 package
+    contains 234 observations collected by the US Environmental Protection Agency on 38 car models. Which variables in `mpg` are categorical? Which variables are numerical? (Hint: Type [`?mpg`](https://ggplot2.tidyverse.org/reference/mpg.html) to read the documentation for the dataset.) How can you see this information when you run `mpg`?
+
+```{r}
+mpg |> head()
+```
+
+Categorical variables: *model, trans, drv\
+*Numerical variables: *displ, year, cyl*
+
+2.  Make a scatterplot of `hwy` vs. `displ` using the `mpg` data frame. Next, map a third, numerical variable to `color`, then `size`, then both `color` and `size`, then `shape`. How do these aesthetics behave differently for categorical vs. numerical variables?
+
+```{r}
+#| error: true
+#| 
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = cyl))
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(size = cyl))
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = cyl, size = cyl))
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(shape = cyl))
+```
+
+A numeric variable can't be mapped to the `shape` aesthetic.
+
+3.  In the scatterplot of `hwy` vs. `displ`, what happens if you map a third variable to `linewidth`?
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(linewidth = cyl))
+```
+
+If you map a third variable to `linewidth`, it's ignored.
+
+4.  What happens if you map the same variable to multiple aesthetics?
+
+It's used for each aesthetic.
+
+5.  Make a scatterplot of `bill_depth_mm` vs. `bill_length_mm` and color the points by `species`. What does adding coloring by species reveal about the relationship between these two variables? What about faceting by `species`?
+
+```{r}
+ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm,
+                     color = species)) +
+  geom_point()
+```
+
+`bill_depth_mm` and `bill_length_mm` appear to be correlated within species.
+
+6.  Why does the following yield two separate legends? How would you fix it to combine the two legends?
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs(color = "Species")
+
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm,
+    y = bill_depth_mm,
+    color = species,
+    shape = species
+  )
+) +
+  geom_point()
+```
+
+It yields separate legends because `color = "Species"` in `labs` overrides `color = species` in `ggplot`. To combine the two legends, remove the `labs` call.
+
+7.  Create the two following stacked bar plots. Which question can you
+    answer with the first one? Which question can you answer with the second one?
+
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+
+ggplot(penguins, aes(x = species, fill = island)) +
+  geom_bar(position = "fill")
+```
+
+The first plot shows the percentage of each species of the total on an island. The second plot shows the distribution of a species across islands.
+
+#### 1.6.1 Exercises
+
+1.  Run the following lines of code. Which of the two plots is saved as `mpg-plot.png`? Why?
+
+```{r}
+ggplot(mpg, aes(x = class)) +
+  geom_bar()
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+ggsave("mpg-plot.png")
+```
+
+The second plot is saved because it's the most recently created plot.
+
+2.  What do you need to change in the code above to save the plot as a PDF instead of a PNG? How could you find out what types of image files would work in [`ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)?
+
+```{r}
+ggsave("mpg-plot.pdf")
+```
+
+To save the plot as a PDF, change the extension to *pdf*. To find out what types of image files are supported, see the documentation for `ggsave()`. If the `device` argument is `NULL` (the default), the image type is guessed based on the `filename` extension.
