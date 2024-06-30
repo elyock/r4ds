@@ -39,7 +39,7 @@ flights |>
 
 2.  Sort `flights` to find the flights with longest departure delays. Find the flights that left earliest in the morning.
 
-This question makes sense to me only if it's two separate sorts.
+This question makes sense to me only if it's asking for two separate sorts.
 
 ```{r}
 flights |>
