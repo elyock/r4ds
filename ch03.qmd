@@ -1,0 +1,13 @@
+---
+title: "Chapter 3"
+author: "Kevin J. Coyle"
+format: gfm
+editor: visual
+---
+
+```{r}
+#| label: setup
+
+library(nycflights13)
+library(tidyverse)
+```
