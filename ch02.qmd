@@ -1,0 +1,50 @@
+---
+title: "Chapter 2"
+author: "Kevin J. Coyle"
+format: gfm
+editor: visual
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+```
+
+#### 2.5 Exercises
+
+1.  Why does this code not work?
+
+```{r}
+#| error: true
+
+my_variable <- 10
+my_varıable
+```
+
+The "i" character is different in the two variable names.
+
+2.  Tweak each of the following R commands so that they run correctly:
+
+```{r}
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+3.  Press Option + Shift + K / Alt + Shift + K. What happens? How can you get to the same place using the menus?
+
+Pressing this key combination presents a window with Keyboard Shortcut Quick Reference help. Using the menus, Help-\>Keyboard Shortcuts Help presents the same window.
+
+4.  Let’s revisit an exercise from the [Section 1.6](https://r4ds.hadley.nz/data-visualize#sec-ggsave). Run the following lines of code. Which of the two plots is saved as `mpg-plot.png`? Why?
+
+```{r}
+my_bar_plot <- ggplot(mpg, aes(x = class)) +
+  geom_bar()
+my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+ggsave(filename = "mpg-plot.png", plot = my_bar_plot)
+```
+
+The first plot is saved to file as `mpg-plot.png` because the plot is saved in the variable `my_bar_plot`, which is assigned to `plot` in the call to `ggsave()`.
