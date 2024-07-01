@@ -137,3 +137,129 @@ flights |>
 ```
 
 This doesn't work because the result of the call to `select()` contains only the variable `tailnum`, and not the variable `arr_delay`.
+
+#### 3.5.7 Exercises
+
+1.  Which carrier has the worst average delays? Challenge: can you disentangle the effects of bad airports vs. bad carriers? Why/why not? (Hint: think about `flights |> group_by(carrier, dest) |> summarize(n())`)
+
+```{r}
+flights |>
+  summarise(
+    avg_arr_delay = mean(arr_delay, na.rm = TRUE),
+    .by = carrier
+  ) |>
+  arrange(desc(avg_arr_delay))
+flights |>
+    summarise(
+    avg_arr_delay = mean(arr_delay, na.rm = TRUE),
+    .by = c(carrier, dest)
+  ) |>
+  arrange(desc(avg_arr_delay))
+
+```
+
+2.  Find the flights that are most delayed upon departure from each destination.
+
+```{r}
+flights |>
+  group_by(dest) |>
+  arrange(dest, desc(dep_delay)) |>
+  slice_head(n = 1) |>
+  relocate(dest, dep_delay)
+```
+
+3.  How do delays vary over the course of the day. Illustrate your answer with a plot.
+
+```{r}
+flights |>
+  group_by(hour) |>
+  summarise(avg_delay = mean(dep_delay, na.rm = TRUE)) |>
+  ggplot(aes(x = hour, y = avg_delay)) +
+    geom_point() +
+    geom_smooth()
+```
+
+4.  What happens if you supply a negative `n` to [`slice_min()`](https://dplyr.tidyverse.org/reference/slice.html) and friends?
+
+The absolute value of `n` is subtracted from the group size.
+
+5.  Explain what [`count()`](https://dplyr.tidyverse.org/reference/count.html) does in terms of the dplyr verbs you just learned. What does the `sort` argument to [`count()`](https://dplyr.tidyverse.org/reference/count.html) do?
+
+`count` counts the number of observations in each group. The `sort` argument, if `TRUE` show the largest groups first. The default value of `sort` is `FALSE`.
+
+6.  Suppose we have the following tiny data frame:
+
+```{r}
+df <- tibble(
+  x = 1:5,
+  y = c("a", "b", "a", "a", "b"),
+  z = c("K", "K", "L", "L", "K")
+)
+```
+
+a\. Write down what you think the output will look like, then check if you were correct, and describe what [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html) does.
+
+It groups by `y`; `y` is unsorted.
+
+```{r}
+df |>
+  group_by(y)
+```
+
+b\. Write down what you think the output will look like, then check if you were correct, and describe what [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) does. Also comment on how it’s different from the [`group_by()`](https://dplyr.tidyverse.org/reference/group_by.html) in part (a).
+
+It sorts by `y` ascending.
+
+```{r}
+df |>
+  arrange(y)
+```
+
+c\. Write down what you think the output will look like, then check if you were correct, and describe what the pipeline does.
+
+It groups by `y` and calculates the mean of `x` for each `y` group.
+
+```{r}
+df |>
+  group_by(y) |>
+  summarize(mean_x = mean(x))
+```
+
+d\. Write down what you think the output will look like, then check if you
+were correct, and describe what the pipeline does. Then, comment on what the message says.
+
+It groups by `y` and by `z` within each `y`, and calculates the mean of `x` within each `y` and `z` subgroup. The message means that summarize drops the `z` grouping and groups output by `y` only.
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+```
+
+e\. Write down what you think the output will look like, then check if you
+were correct, and describe what the pipeline does. How is the output
+different from the one in part (d)?
+
+It does the same grouping and calculation, but drops all the grouping in the output.
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x), .groups = "drop")
+```
+
+f\. Write down what you think the outputs will look like, then check
+if you were correct, and describe what each pipeline does. How are the
+outputs of the two pipelines different?
+
+`summarize()` has one summary row per `y` `z` grouping in the output data frame, and the `z` grouping is dropped. With `mutate` the groupings are kept, the output data frame has the same number of rows as the input data frame, and the `x` variable is kept.
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x))
+```
